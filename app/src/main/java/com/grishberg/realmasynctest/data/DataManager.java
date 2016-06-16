@@ -94,10 +94,10 @@ public class DataManager {
                 }
             });
             RealmResults<SampleModel> results = rm.where(SampleModel.class).findAll();
-
-            Log.d(TAG, "run: transaction ended, left = " + results.size());
+            Log.d(TAG, "changeDataRunnable1: transaction ended, left = " + results.size());
             rm.close();
-            Log.d(TAG, "run: end");
+            sleep(5000);
+            Log.d(TAG, "changeDataRunnable1: end");
         }
     };
 
@@ -129,9 +129,9 @@ public class DataManager {
             });
             RealmResults<SampleModel> results = rm.where(SampleModel.class).findAll();
 
-            Log.d(TAG, "run: transaction ended, left = " + results.size());
+            Log.d(TAG, "changeDataRunnable2: transaction ended, left = " + results.size());
             rm.close();
-            Log.d(TAG, "run: end");
+            Log.d(TAG, "changeDataRunnable2: end");
         }
     };
 
@@ -156,9 +156,9 @@ public class DataManager {
             });
             RealmResults<SampleModel> results = rm.where(SampleModel.class).findAll();
 
-            Log.d(TAG, "run: transaction ended, left = " + results.size());
+            Log.d(TAG, "changeDataRunnable3: transaction ended, left = " + results.size());
             rm.close();
-            Log.d(TAG, "run: end");
+            Log.d(TAG, "changeDataRunnable3: end");
         }
     };
 
