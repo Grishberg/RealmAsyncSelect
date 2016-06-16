@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         // start changing data in different thread
         Log.d(TAG, "testSync: start");
         dataManager.startFirstDataChange();
+        dataManager.startFirstDataChangeParallel();
     }
 
     /**

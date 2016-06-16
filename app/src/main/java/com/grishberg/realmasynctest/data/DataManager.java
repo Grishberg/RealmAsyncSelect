@@ -17,7 +17,7 @@ import io.realm.Sort;
  */
 public class DataManager {
     private static final String TAG = DataManager.class.getSimpleName();
-    public static final int COUNT = 20;
+    public static final int COUNT = 30;
 
     private Realm realm;
 
@@ -56,6 +56,9 @@ public class DataManager {
     public void startFirstDataChange() {
         new Thread(changeDataRunnable1).start();
     }
+    public void startFirstDataChangeParallel() {
+        new Thread(changeDataRunnableParallel1).start();
+    }
 
     public void startSecondDataChange() {
         new Thread(changeDataRunnable2).start();
@@ -78,7 +81,7 @@ public class DataManager {
 
                 @Override
                 public void execute(Realm realm) {
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 15; i++) {
                         realm.where(SampleModel.class)
                                 .equalTo("id", i).findAll().deleteAllFromRealm();
                         Log.d(TAG, "execute: deleted id=" + i);
@@ -101,6 +104,39 @@ public class DataManager {
         }
     };
 
+    private Runnable changeDataRunnableParallel1 = new Runnable() {
+
+        @Override
+        public void run() {
+            sleep(2000);
+            Realm rm = Realm.getDefaultInstance();
+            rm.executeTransaction(new Realm.Transaction() {
+
+                @Override
+                public void execute(Realm realm) {
+                    for (int i = 15; i < 20; i++) {
+                        realm.where(SampleModel.class)
+                                .equalTo("id", i).findAll().deleteAllFromRealm();
+                        Log.d(TAG, "execute: deleted id=" + i);
+                        sleep(310);
+                    }
+
+                    for (int i = 200; i < 210; i++) {
+                        SampleModel sampleModel = new SampleModel();
+                        sampleModel.setId(i);
+                        sampleModel.setName(String.format(Locale.US, "new item %d", i));
+                        realm.copyToRealmOrUpdate(sampleModel);
+                    }
+                }
+            });
+            RealmResults<SampleModel> results = rm.where(SampleModel.class).findAll();
+            Log.d(TAG, "changeDataRunnable1: transaction ended, left = " + results.size());
+            rm.close();
+            sleep(5000);
+            Log.d(TAG, "changeDataRunnable1: end");
+        }
+    };
+
     /**
      * change data runnable
      */
@@ -108,6 +144,7 @@ public class DataManager {
 
         @Override
         public void run() {
+            sleep(2000);
             Realm rm = Realm.getDefaultInstance();
             rm.executeTransaction(new Realm.Transaction() {
 
