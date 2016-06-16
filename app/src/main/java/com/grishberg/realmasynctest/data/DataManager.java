@@ -114,7 +114,7 @@ public class DataManager {
 
                 @Override
                 public void execute(Realm realm) {
-                    for (int i = 15; i < 20; i++) {
+                    for (int i = 2; i < 20; i++) {
                         realm.where(SampleModel.class)
                                 .equalTo("id", i).findAll().deleteAllFromRealm();
                         Log.d(TAG, "execute: deleted id=" + i);
