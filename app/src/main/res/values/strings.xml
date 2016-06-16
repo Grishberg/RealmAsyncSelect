@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RealmAsyncTest</string>
+    <string name="change_data">Change data</string>
+</resources>
