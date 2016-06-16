@@ -1,24 +1,26 @@
-package com.grishberg.realmasynctest.adapters;
+package com.grishberg.realmasynctest.ui.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.grishberg.realmasynctest.R;
-import com.grishberg.realmasynctest.models.SampleModel;
+import com.grishberg.realmasynctest.data.models.SampleModel;
 
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 /**
  * Created by grishberg on 16.06.16.
- *
  */
 public class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.SampleViewHolder> {
     private static final String TAG = SampleAdapter.class.getSimpleName();
+    private final Context context;
     // realm results
     private final RealmResults<SampleModel> realmResults;
     // observer for handling data change in request
@@ -26,11 +28,14 @@ public class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.SampleView
         @Override
         public void onChange(Object element) {
             Log.d(TAG, "onChange: " + element);
+            Toast.makeText(context, context.getString(R.string.data_changed), Toast.LENGTH_SHORT)
+                    .show();
             notifyDataSetChanged();
         }
     };
 
-    public SampleAdapter(RealmResults<SampleModel> realmResults) {
+    public SampleAdapter(Context context, RealmResults<SampleModel> realmResults) {
+        this.context = context;
         this.realmResults = realmResults;
         realmResults.addChangeListener(callback);
     }

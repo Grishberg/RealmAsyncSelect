@@ -1,4 +1,4 @@
-package com.grishberg.realmasynctest.models;
+package com.grishberg.realmasynctest.data.models;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

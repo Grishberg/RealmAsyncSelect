@@ -1,4 +1,4 @@
-package com.grishberg.realmasynctest;
+package com.grishberg.realmasynctest.ui.adapters;
 
 import android.content.Context;
 import android.content.res.TypedArray;

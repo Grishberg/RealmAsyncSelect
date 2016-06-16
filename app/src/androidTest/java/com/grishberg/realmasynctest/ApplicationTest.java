@@ -1,15 +1,11 @@
 package com.grishberg.realmasynctest;
 
-import android.app.Application;
-import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.core.deps.guava.util.concurrent.Runnables;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.ApplicationTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
-import com.grishberg.realmasynctest.models.SampleModel;
+import com.grishberg.realmasynctest.data.models.SampleModel;
 
 import org.junit.Before;
 import org.junit.Test;

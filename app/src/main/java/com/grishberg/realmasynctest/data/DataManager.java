@@ -1,16 +1,9 @@
-package com.grishberg.realmasynctest;
+package com.grishberg.realmasynctest.data;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
-import com.grishberg.realmasynctest.adapters.SampleAdapter;
-import com.grishberg.realmasynctest.models.SampleModel;
+import com.grishberg.realmasynctest.data.models.SampleModel;
+import com.grishberg.realmasynctest.data.models.YetAnotherModel;
 
 import java.util.Locale;
 
@@ -19,73 +12,23 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 /**
- * sample activity for test async data changing in Realm 1.0
+ * Created by grishberg on 16.06.16.
+ * manage realm queries
  */
-public class MainActivity extends AppCompatActivity {
-    public static final String TAG = MainActivity.class.getSimpleName();
+public class DataManager {
+    private static final String TAG = DataManager.class.getSimpleName();
     public static final int COUNT = 20;
 
     private Realm realm;
-    private SampleAdapter adapter;
-    private RecyclerView rv;
-    private Button btChangeData;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        // create sample data
-        createData();
-
-        // init Realm instance
+    public DataManager() {
         realm = Realm.getDefaultInstance();
-
-        initDataQuery();
-
-        initViews();
-
-        // start changing data in different thread
-        Log.d(TAG, "testSync: start");
-        new Thread(changeDataRunnable1).start();
-
-    }
-
-    /**
-     * init views
-     */
-    private void initViews() {
-        rv = (RecyclerView) findViewById(R.id.rv);
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setItemAnimator(new DefaultItemAnimator());
-        rv.setAdapter(adapter);
-        rv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-
-        btChangeData = (Button) findViewById(R.id.btChangeData);
-        btChangeData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Thread(changeDataRunnable2).start();
-            }
-        });
-    }
-
-    /**
-     * init data query for adapter
-     */
-    private void initDataQuery() {
-        RealmResults<SampleModel> results = realm.where(SampleModel.class)
-                .findAllSortedAsync("id", Sort.ASCENDING);
-        Log.d(TAG, "onCreate: " + results.isLoaded());
-
-        Log.d(TAG, "testSync: end");
-        adapter = new SampleAdapter(results);
     }
 
     /**
      * Create sample data
      */
-    private void createData() {
+    public void createData() {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         realm.where(SampleModel.class).findAll().deleteAllFromRealm();
@@ -99,11 +42,27 @@ public class MainActivity extends AppCompatActivity {
         realm.close();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        adapter.release();
-        realm.close();
+    public RealmResults<SampleModel> getDataQuery() {
+        return realm.where(SampleModel.class)
+                .findAllSortedAsync("id", Sort.ASCENDING);
+    }
+
+    public void release() {
+        if (realm != null && !realm.isClosed()) {
+            realm.close();
+        }
+    }
+
+    public void startFirstDataChange() {
+        new Thread(changeDataRunnable1).start();
+    }
+
+    public void startSecondDataChange() {
+        new Thread(changeDataRunnable2).start();
+    }
+
+    public void startOtherDataChange() {
+        new Thread(changeDataRunnable3).start();
     }
 
     /**
@@ -165,6 +124,33 @@ public class MainActivity extends AppCompatActivity {
                         sampleModel.setId(i);
                         sampleModel.setName(String.format(Locale.US, "newest item %d", i));
                         realm.copyToRealmOrUpdate(sampleModel);
+                    }
+                }
+            });
+            RealmResults<SampleModel> results = rm.where(SampleModel.class).findAll();
+
+            Log.d(TAG, "run: transaction ended, left = " + results.size());
+            rm.close();
+            Log.d(TAG, "run: end");
+        }
+    };
+
+    private Runnable changeDataRunnable3 = new Runnable() {
+
+        @Override
+        public void run() {
+            Realm rm = Realm.getDefaultInstance();
+            rm.executeTransaction(new Realm.Transaction() {
+
+                @Override
+                public void execute(Realm realm) {
+
+                    for (int i = 100; i < 110; i++) {
+                        YetAnotherModel model = new YetAnotherModel();
+                        model.setId(i);
+                        model.setName(String.format(Locale.US, "another item %d", i));
+                        model.setDescription(String.format(Locale.US, "item description %d", i));
+                        realm.copyToRealmOrUpdate(model);
                     }
                 }
             });
